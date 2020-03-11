@@ -1,0 +1,127 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/fuchsia/zircon_images.gni")
+import("//build/fuzzing/fuzzer.gni")
+import("//build/package.gni")
+
+zircon_extras_manifest("zircon_test_manifest") {
+  manifest = "tests"
+  patterns = [ "*" ]
+}
+
+package("zircon_tests") {
+  __deprecated_system_image = true
+  deps = [
+    ":zircon_test_manifest",
+    ":zircon_test_metadata",
+  ]
+  extra = get_target_outputs(":zircon_test_manifest")
+}
+
+zircon_extras_manifest("zircon_fuzzers_manifest") {
+  manifest = "tests"
+  patterns = [
+    "bin/*-fuzzer.*",
+    "meta/*-fuzzer.*.cmx",
+  ]
+}
+
+group("zircon_test_metadata") {
+  test_specs = read_file("$zircon_root_build_dir/tests.json", "json")
+  target_test_specs = []
+  foreach(spec, test_specs) {
+    _test = {
+    }
+    _test = spec.test
+
+    # Note: zircon host tests are surfaced separately as
+    # //src:zircon_host_tests; this is done separately as we want to run host
+    # tests - bringup or otherwise - together, and the same can't be said of
+    # zircon tests.
+    if (_test.os == "fuchsia") {
+      target_test_specs += [
+        {
+          test = {
+            forward_variables_from(_test, "*")
+            label = string_replace(label, "//", "//zircon/")
+          }
+        },
+      ]
+    }
+  }
+  metadata = {
+    tests = target_test_specs
+  }
+}
+
+# When migrating Zircon fuzzers to the Fuchsia build, add them to this list.
+_migrated_fuzzers = [
+  "//src/devices/block/drivers/ftl/test:ftl-read-write-fuzzer",
+  "//src/connectivity/ethernet/drivers/usb-cdc-ecm:usb-cdc-ecm-descriptor-fuzzer",
+  "//src/media/audio/drivers/intel-hda/controller:nhlt-fuzzer",
+  "//zircon/system/ulib/affine/test:affine-fuzzer",
+  "//zircon/system/ulib/bitmap/test:raw-bitmap-fuzzer",
+  "//zircon/system/ulib/blobfs/test:zstd-fuzzer",
+  "//zircon/system/ulib/blobfs/test:zstd-seekable-fuzzer",
+  "//zircon/system/ulib/blobfs/test:zstd-seekable-symmetric-fuzzer",
+  "//zircon/system/ulib/bootfs/test:bootfs-parser-fuzzer",
+  "//zircon/system/ulib/fs/journal/test:journal-entry-fuzzer",
+  "//zircon/system/ulib/fs/journal/test:journal-fuzzer",
+  "//zircon/system/ulib/fs/journal/test:journal-replay-fuzzer",
+  "//zircon/system/ulib/fs/test:vmo_file-fuzzer",
+  "//zircon/system/ulib/gfx/test:gfx-fuzzer",
+  "//zircon/system/ulib/hid-parser/test:hid-parser-fuzzer",
+  "//zircon/system/ulib/ldmsg/test:ldmsg-fuzzer",
+  "//zircon/system/ulib/paver/test:paver-validation-fuzzer",
+  "//zircon/system/ulib/tftp/test:tftp-fuzzer",
+  "//zircon/system/ulib/utf_conversion/test:utf_conversion-fuzzer",
+  "//zircon/system/ulib/zircon-crypto/test:hmac-fuzzer",
+  "//zircon/system/utest/noop-fuzzer",
+]
+
+# Emits a JSON manifest similar to the one used to incorporate Zircon fuzzers into the Fuchsia GN
+# build pre-unification. This is used to validate that the list of Zircon fuzzers is the unchanged
+# as fuzzers are being migrated. Post-unification, this target can be removed.
+generated_file("migrated_fuzzers_manifest") {
+  outputs = [ "$root_build_dir/migrated_zircon_fuzzers.json" ]
+  contents = []
+  foreach(fuzzer, _migrated_fuzzers) {
+    fuzzer_name = get_label_info(fuzzer, "name")
+    foreach(variant,
+            [
+              "asan",
+              "asan-ubsan",
+              "ubsan",
+            ]) {
+      contents += [ "$fuzzer_name.$variant" ]
+    }
+  }
+  output_conversion = "json"
+}
+
+fuzzers_package("zircon_fuzzers") {
+  # Zircon fuzzers built using Fuchsia GN.
+  fuzzers = _migrated_fuzzers
+
+  # Zircon fuzzers built using Zircon GN., only enabled if a fuzzer variant is selected.
+  fuzzer_variants = [
+    "asan-fuzzer",
+    "asan-ubsan-fuzzer",
+    "ubsan-fuzzer",
+  ]
+  if (select_variant_canonical + fuzzer_variants - fuzzer_variants !=
+      select_variant_canonical) {
+    fuzzers_manifest = {
+      target = ":zircon_fuzzers_manifest"
+      output = "$zircon_root_build_dir/legacy_fuzzers-$target_cpu.json"
+    }
+    deps = [ ":migrated_fuzzers_manifest" ]
+  }
+}
+
+# Known to infrastructure.
+# TODO(fxbug.dev/10198): delete me. zbi_tests.json is now always produced.
+group("zbi_tests") {
+}

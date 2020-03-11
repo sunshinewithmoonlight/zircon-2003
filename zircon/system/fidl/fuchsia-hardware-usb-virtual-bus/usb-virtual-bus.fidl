@@ -1,0 +1,19 @@
+// Copyright 2018 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+library fuchsia.hardware.usb.virtual.bus;
+
+using zx;
+
+[Layout = "Simple"]
+protocol Bus {
+    /// Enables the virtual bus.
+    Enable() -> (zx.status status);
+    /// Disables the virtual bus.
+    Disable() -> (zx.status status);
+    /// Simulates a USB connected event.
+    Connect() -> (zx.status status);
+    /// Simulates a USB connected event.
+    Disconnect() -> (zx.status status);
+};

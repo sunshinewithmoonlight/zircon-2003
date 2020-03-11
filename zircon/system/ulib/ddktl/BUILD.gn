@@ -1,0 +1,28 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+zx_library("ddktl") {
+  sdk = "source"
+  sdk_publishable = false
+  sdk_headers = [
+    "ddktl/device-internal.h",
+    "ddktl/device.h",
+  ]
+  sources = []
+  public_deps = [
+    # <ddktl/device-internal.h> has #include <fbl/macros.h>.
+    "$zx/system/ulib/fbl:headers",
+
+    # <ddktl/protocol/display-controller.h> has #include <lib/zx/vmo.h>.
+    "$zx/system/ulib/zx:headers",
+  ]
+  deps = [
+    "$zx/system/dev/lib/mmio",
+    "$zx/system/ulib/ddk",
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/sync",
+    "$zx/system/ulib/zircon",
+    "$zx/system/ulib/zx",
+  ]
+}

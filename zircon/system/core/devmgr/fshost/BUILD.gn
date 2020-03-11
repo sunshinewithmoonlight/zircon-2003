@@ -1,0 +1,180 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+source_set("fshost-registry") {
+  sources = [
+    "admin-server.cc",
+    "fs-manager.cc",
+    "registry.cc",
+    "registry_vnode.cc",
+  ]
+  public_deps = [
+    ":metrics",
+    "$zx/system/fidl/fuchsia-fshost:llcpp",
+    "$zx/system/ulib/async-loop:async-loop-cpp",
+    "$zx/system/ulib/async-loop:async-loop-default.static",
+    "$zx/system/ulib/fit",
+    "$zx/system/ulib/fs",
+    "$zx/system/ulib/memfs",
+    "$zx/system/ulib/zircon-internal",
+    "$zx/system/ulib/zx",
+    "../shared",
+  ]
+  deps = [
+    "$zx/system/fidl/fuchsia-boot:llcpp",
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/fidl-async:fidl-async-cpp",
+    "$zx/system/ulib/loader-service",
+    "$zx/system/ulib/memfs:memfs-cpp",
+    "$zx/system/ulib/zircon",
+    "$zx/system/ulib/zircon-internal",
+  ]
+}
+
+source_set("metrics") {
+  sources = [
+    "metrics.cc",
+    "metrics.h",
+  ]
+  public_deps = [
+    "$zx/system/ulib/async:async-cpp",
+    "$zx/system/ulib/cobalt-client:headers",
+    "$zx/system/ulib/fs/metrics:metrics-cobalt",
+  ]
+  deps = [
+    "$zx/system/ulib/cobalt-client",
+    "$zx/system/ulib/fs/metrics:metrics-cobalt",
+  ]
+}
+
+source_set("block-watcher") {
+  sources = [
+    "block-device.cc",
+    "block-watcher.cc",
+    "encrypted-volume.cc",
+    "filesystem-mounter.cc",
+    "fshost-fs-provider.cc",
+    "pkgfs-launcher.cc",
+  ]
+  public_deps = [
+    ":metrics",
+    "$zx/system/fidl/fuchsia-fshost:llcpp",
+    "$zx/system/ulib/async-loop:async-loop-cpp",
+    "$zx/system/ulib/async-loop:async-loop-default.static",
+    "$zx/system/ulib/fdio-caller",
+    "$zx/system/ulib/fit",
+    "$zx/system/ulib/fs",
+    "$zx/system/ulib/memfs",
+    "$zx/system/ulib/zircon-internal",
+    "$zx/system/ulib/zx",
+    "../shared",
+  ]
+  deps = [
+    ":fshost-registry",
+    "$zx/system/fidl/fuchsia-boot:c",
+    "$zx/system/fidl/fuchsia-boot:llcpp",
+    "$zx/system/fidl/fuchsia-device:c",
+    "$zx/system/fidl/fuchsia-device:llcpp",
+    "$zx/system/fidl/fuchsia-hardware-block:c",
+    "$zx/system/fidl/fuchsia-hardware-block-encrypted:c",
+    "$zx/system/fidl/fuchsia-hardware-block-partition:c",
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/fidl",
+    "$zx/system/ulib/fit",
+    "$zx/system/ulib/fs",
+    "$zx/system/ulib/fs-management",
+    "$zx/system/ulib/gpt",
+    "$zx/system/ulib/loader-service",
+    "$zx/system/ulib/minfs",
+    "$zx/system/ulib/trace",
+    "$zx/system/ulib/trace-engine",
+    "$zx/system/ulib/zircon",
+    "$zx/system/ulib/zircon-internal",
+    "$zx/system/ulib/zx",
+    "$zx/system/ulib/zxcrypt:zxcrypt-fdio",
+  ]
+}
+
+zx_executable("fshost") {
+  sources = [ "main.cc" ]
+  deps = [
+    ":block-watcher",
+    ":fshost-registry",
+    ":metrics",
+    "$zx/system/fidl/fuchsia-boot:c",
+    "$zx/system/fidl/fuchsia-boot:llcpp",
+    "$zx/system/fidl/fuchsia-fshost:c",
+    "$zx/system/fidl/fuchsia-fshost:llcpp",
+    "$zx/system/fidl/fuchsia-ldsvc:c",
+    "$zx/system/ulib/cobalt-client",
+    "$zx/system/ulib/fidl-async:fidl-async-cpp",
+    "$zx/system/ulib/fs-management",
+    "$zx/system/ulib/hermetic-decompressor",
+    "$zx/system/ulib/loader-service",
+    "$zx/system/ulib/ramdevice-client",
+  ]
+}
+
+zx_test("fshost-test") {
+  test_group = "ddk"
+  sources = [
+    "delayed-outdir-test.cc",
+    "fshost-boot-args-test.cc",
+    "fshost-test.cc",
+  ]
+  deps = [
+    ":block-watcher",
+    ":fshost-registry",
+    ":metrics",
+    "$zx/system/fidl/fuchsia-boot:llcpp",
+    "$zx/system/fidl/fuchsia-io:c",
+    "$zx/system/ulib/cobalt-client",
+    "$zx/system/ulib/cobalt-client:in-memory-logger",
+    "$zx/system/ulib/fidl-async",
+    "$zx/system/ulib/loader-service",
+    "$zx/system/ulib/mock-boot-arguments",
+    "$zx/system/ulib/zxtest",
+  ]
+
+  # TODO(46432): Fix the leaks and remove this.
+  deps +=
+      [ "$zx/public/gn/config/instrumentation:suppress-lsan.DO-NOT-USE-THIS" ]
+}
+
+zx_test("fshost-metrics-test") {
+  test_group = "ddk"
+  sources = [ "metrics-test.cc" ]
+  deps = [
+    ":metrics",
+    "$zx/system/fidl/fuchsia-boot:llcpp",
+    "$zx/system/ulib/async-testing",
+    "$zx/system/ulib/cobalt-client:in-memory-logger",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/fs/metrics:metrics-cobalt",
+    "$zx/system/ulib/zxtest",
+  ]
+}
+
+zx_test("block-watcher-test") {
+  test_group = "ddk"
+  sources = [
+    "block-device-test.cc",
+    "block-watcher-test.cc",
+    "filesystem-mounter-test.cc",
+  ]
+  deps = [
+    ":block-watcher",
+    "$zx/system/fidl/fuchsia-boot:llcpp",
+    "$zx/system/ulib/cobalt-client:in-memory-logger",
+    "$zx/system/ulib/fidl-async",
+    "$zx/system/ulib/fs-management",
+    "$zx/system/ulib/fs/metrics:metrics-cobalt",
+    "$zx/system/ulib/loader-service",
+    "$zx/system/ulib/minfs",
+    "$zx/system/ulib/ramdevice-client",
+    "$zx/system/ulib/zxtest",
+  ]
+}

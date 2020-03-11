@@ -1,0 +1,42 @@
+// Copyright 2018 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+library fuchsia.sysinfo;
+
+using zx;
+
+const uint8 BOARD_NAME_LEN = 32;
+const uint8 BOOTLOADER_VENDOR_LEN = 32;
+
+enum InterruptControllerType {
+    UNKNOWN = 0;
+    APIC = 1;
+    GIC_V2 = 2;
+    GIC_V3 = 3;
+};
+
+struct InterruptControllerInfo {
+    InterruptControllerType type;
+};
+
+[Discoverable, Layout = "Simple"]
+protocol SysInfo {
+    /// Return the hypervisor resource (with only ZX_RIGHT_TRANSFER).
+    GetHypervisorResource() -> (zx.status status, handle<resource>? resource);
+
+    /// Return the board name for the platform we are running on.
+    GetBoardName() -> (zx.status status, string:BOARD_NAME_LEN? name);
+
+    /// Return the board revision for the board we are running on.
+    // TODO (nealo):  Remove Transitional qualifier after all board bootloaders
+    // provide board serial number, mac address and revision.
+    [Transitional = "Adding Board Revision"]
+    GetBoardRevision() -> (zx.status status, uint32 revision);
+
+    /// Return the bootloader vendor for the platform we are running on.
+    GetBootloaderVendor() -> (zx.status status, string:BOOTLOADER_VENDOR_LEN? vendor);
+
+    // Return interrupt controller information.
+    GetInterruptControllerInfo() -> (zx.status status, InterruptControllerInfo? info);
+};

@@ -1,0 +1,75 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("$zx/public/gn/package.gni")
+import("$zx/public/gn/zbi.gni")
+
+package("bootsvc") {
+  deps = [ ":bin" ]
+  data_deps = [
+    # When this package() is included in a zbi(), the cmdline
+    # entry to set userboot.root will be included too.
+    ":cmdline",
+  ]
+}
+
+zbi_input("cmdline") {
+  visibility = [ ":*" ]
+  type = "cmdline"
+  args = [ "--entry=userboot.root=${bootfs_package_prefix}bootsvc" ]
+}
+
+zx_executable("bin") {
+  output_name = "bootsvc"
+  sources = [
+    "bootfs-loader-service.cc",
+    "bootfs-loader-service.h",
+    "bootfs-service.cc",
+    "bootfs-service.h",
+    "main.cc",
+    "svcfs-service.cc",
+    "svcfs-service.h",
+  ]
+  deps = [
+    ":util",
+    "$zx/system/fidl/fuchsia-boot:c",
+    "$zx/system/fidl/fuchsia-io:llcpp",
+    "$zx/system/fidl/fuchsia-kernel:llcpp",
+    "$zx/system/ulib/async:async-cpp",
+    "$zx/system/ulib/async:async-default",
+    "$zx/system/ulib/async-loop",
+    "$zx/system/ulib/async-loop:async-loop-cpp",
+    "$zx/system/ulib/async-loop:async-loop-default.static",
+    "$zx/system/ulib/bootfs",
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/fidl",
+    "$zx/system/ulib/fidl-async",
+    "$zx/system/ulib/fidl-async:fidl-async-cpp",
+    "$zx/system/ulib/fs",
+    "$zx/system/ulib/launchpad",
+    "$zx/system/ulib/loader-service",
+    "$zx/system/ulib/memfs:memfs-cpp.static",
+    "$zx/system/ulib/memfs:static",
+    "$zx/system/ulib/trace",
+    "$zx/system/ulib/trace-engine",
+    "$zx/system/ulib/zircon",
+    "$zx/system/ulib/zx",
+  ]
+}
+
+# This is also used by code in test/.
+source_set("util") {
+  visibility = [ "./*" ]
+  sources = [
+    "util.cc",
+    "util.h",
+  ]
+  deps = [ "$zx/third_party/ulib/safemath" ]
+  public_deps = [
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fs",
+    "$zx/system/ulib/zx",
+  ]
+}

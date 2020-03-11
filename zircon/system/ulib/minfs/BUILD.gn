@@ -1,0 +1,129 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+zx_library("minfs") {
+  sdk = "source"
+  sdk_headers = [
+    "minfs/fsck.h",
+    "minfs/bcache.h",
+    "minfs/superblock.h",
+    "minfs/inspector.h",
+    "minfs/writeback.h",
+    "minfs/transaction-limits.h",
+    "minfs/allocator-reservation.h",
+    "minfs/format.h",
+    "minfs/mutex.h",
+    "minfs/minfs.h",
+    "minfs/host.h",
+    "minfs/metrics.h",
+    "minfs/pending-work.h",
+    "minfs/command-handler.h",
+    "minfs/minfs-inspector.h",
+  ]
+  host = true
+  static = true
+  sources = [
+    "allocator/allocator-common.cc",
+    "allocator/allocator-reservation.cc",
+    "allocator/metadata.cc",
+    "allocator/storage-common.cc",
+    "directory.cc",
+    "file.cc",
+    "fsck.cc",
+    "metrics.cc",
+    "minfs.cc",
+    "transaction-limits.cc",
+    "vnode.cc",
+    "writeback.cc",
+  ]
+  if (!is_fuchsia) {
+    sources += [
+      "allocator/allocator-host.cc",
+      "allocator/inode-manager-host.cc",
+      "allocator/storage-host.cc",
+      "bcache-host.cc",
+      "host.cc",
+      "superblock-host.cc",
+    ]
+  }
+  public_deps = [
+    "$zx/system/ulib/bitmap:headers",
+
+    #"$zx/system/ulib/disk_inspector:headers",
+    "$zx/system/ulib/fbl:headers",
+    "$zx/system/ulib/fs:headers",
+    "$zx/system/ulib/fs/journal:headers",
+    "$zx/system/ulib/fs/transaction:headers",
+
+    # <minfs/bcache.h> has #include <fvm/client.h>.
+    "$zx/system/ulib/fvm:headers",
+    "$zx/system/ulib/storage/operation:headers",
+  ]
+  deps = [
+    "$zx/system/ulib/bitmap",
+    "$zx/system/ulib/disk_inspector",
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fit",
+    "$zx/system/ulib/fs",
+    "$zx/system/ulib/fs/transaction",
+    "$zx/system/ulib/storage/buffer",
+    "$zx/system/ulib/storage/operation",
+    "$zx/system/ulib/zircon-internal",
+    "$zx/third_party/ulib/cksum",
+    "$zx/third_party/ulib/safemath",
+  ]
+  if (is_fuchsia) {
+    public_deps += [
+      "$zx/system/fidl/fuchsia-hardware-block:c",
+      "$zx/system/fidl/fuchsia-hardware-block-volume:c",
+      "$zx/system/fidl/fuchsia-minfs:llcpp.headers",
+      "$zx/system/ulib/block-client",
+      "$zx/system/ulib/fzl:headers",
+      "$zx/system/ulib/storage-metrics:headers",
+      "$zx/system/ulib/zx:headers",
+    ]
+    deps += [
+      "$zx/system/fidl/fuchsia-device:c",
+      "$zx/system/fidl/fuchsia-device:llcpp",
+      "$zx/system/fidl/fuchsia-io:llcpp",
+      "$zx/system/fidl/fuchsia-minfs:llcpp",
+      "$zx/system/ulib/async",
+      "$zx/system/ulib/async:async-cpp",
+      "$zx/system/ulib/async:async-default",
+      "$zx/system/ulib/async-loop",
+      "$zx/system/ulib/async-loop:async-loop-cpp",
+      "$zx/system/ulib/async-loop:async-loop-default.static",
+      "$zx/system/ulib/fdio",
+      "$zx/system/ulib/fdio-caller",
+      "$zx/system/ulib/fidl",
+      "$zx/system/ulib/fidl-utils",
+      "$zx/system/ulib/fs/journal",
+      "$zx/system/ulib/fvm",
+      "$zx/system/ulib/fzl",
+      "$zx/system/ulib/storage-metrics",
+      "$zx/system/ulib/storage/operation",
+      "$zx/system/ulib/sync",
+      "$zx/system/ulib/trace",
+      "$zx/system/ulib/trace-engine",
+      "$zx/system/ulib/zircon",
+      "$zx/system/ulib/zx",
+    ]
+    sources += [
+      "allocator/allocator.cc",
+      "allocator/inode-manager.cc",
+      "allocator/storage.cc",
+      "bcache.cc",
+      "inspector-inode-table.cc",
+      "inspector-inode.cc",
+      "inspector-superblock.cc",
+      "inspector.cc",
+      "inspector/command-handler.cc",
+      "inspector/disk-struct.cc",
+      "inspector/loader.cc",
+      "inspector/minfs-inspector.cc",
+      "inspector/parser.cc",
+      "superblock.cc",
+      "vnode-allocation.cc",
+    ]
+  }
+}

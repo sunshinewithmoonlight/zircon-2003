@@ -1,0 +1,91 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# TODO(36548): turn the next 3 libraries back into source_set's visible only to
+# other targets in this file.
+
+zx_library("cobalt-types-internal") {
+  sdk = "source"
+  sdk_headers = [ "cpp/types-internal.h" ]
+  sources = []
+  public_deps = [ "$zx/system/fidl/fuchsia-cobalt:llcpp" ]
+}
+
+zx_library("cobalt-collector") {
+  sdk = "source"
+  sdk_headers = [
+    "cobalt-client/cpp/collector.h",
+    "cobalt-client/cpp/collector_internal.h",
+  ]
+  sources = [
+    "cobalt_logger.cc",
+    "collector.cc",
+  ]
+  public_deps = [
+    "$zx/system/fidl/fuchsia-cobalt:llcpp.headers",
+    "$zx/system/ulib/fit:headers",
+    "$zx/system/ulib/zx:headers",
+  ]
+  deps = [
+    ":cobalt-types-internal",
+    "$zx/system/fidl/fuchsia-cobalt:llcpp",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/fit",
+    "$zx/system/ulib/zx",
+  ]
+}
+
+zx_library("cobalt-metrics") {
+  sdk = "source"
+  sdk_headers = [
+    "cobalt-client/cpp/histogram_internal.h",
+    "cobalt-client/cpp/counter.h",
+    "cobalt-client/cpp/histogram.h",
+    "cobalt-client/cpp/counter_internal.h",
+    "cobalt-client/cpp/metric_options.h",
+  ]
+  sources = [
+    "counter.cc",
+    "histogram.cc",
+  ]
+  public_deps = [
+    ":cobalt-collector.headers",
+    ":cobalt-types-internal.headers",
+  ]
+  deps = [
+    ":cobalt-collector",
+    ":cobalt-types-internal",
+  ]
+}
+
+zx_library("cobalt-client") {
+  sdk = "source"
+  sdk_headers = []
+  sources = []
+  public_deps = [
+    ":cobalt-collector.headers",
+    ":cobalt-metrics.headers",
+  ]
+  deps = [
+    ":cobalt-collector",
+    ":cobalt-metrics",
+  ]
+}
+
+# This library may only be imported from tests.
+zx_library("in-memory-logger") {
+  sdk = "source"
+  sdk_headers = [
+    "cobalt-client/cpp/in_memory_logger.h",
+  ]
+  testonly = true
+  sources = [ "in_memory_logger.cc" ]
+  public_deps = [ ":cobalt-metrics" ]
+  deps = [
+    ":cobalt-types-internal",
+    "$zx/system/ulib/fit:headers",
+    "$zx/system/ulib/zx:headers",
+    "$zx/system/fidl/fuchsia-cobalt:llcpp",
+  ]
+}

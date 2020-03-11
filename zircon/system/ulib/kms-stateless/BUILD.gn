@@ -1,0 +1,13 @@
+zx_library("kms-stateless") {
+  sources = [ "kms-stateless.cc" ]
+  sdk = "source"
+  sdk_headers = [ "kms-stateless/kms-stateless.h" ]
+
+  deps = [
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/keysafe",
+    "$zx/system/ulib/ramdevice-client",
+    "$zx/system/ulib/tee-client-api",
+  ]
+}

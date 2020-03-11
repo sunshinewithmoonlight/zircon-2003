@@ -1,0 +1,55 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+zx_library("transaction") {
+  host = true
+  sources = []
+  static = true
+
+  sdk = "source"
+  sdk_headers = [
+    "fs/transaction/block_transaction.h",
+    "fs/transaction/buffered_operations_builder.h",
+    "fs/transaction/writeback.h",
+  ]
+
+  public_deps = [
+    "$zx/system/ulib/fbl:headers",
+    "$zx/system/ulib/storage/buffer:headers",
+    "$zx/system/ulib/storage/operation:headers",
+  ]
+
+  if (is_fuchsia) {
+    sources = [
+      "block_transaction.cc",
+      "buffered_operations_builder.cc",
+      "writeback.cc",
+    ]
+
+    public_deps += [
+      "$zx/system/ulib/block-client:headers",
+      "$zx/system/ulib/fit:headers",
+    ]
+
+    deps = [
+      "$zx/system/ulib/fbl",
+      "$zx/system/ulib/fdio",
+      "$zx/system/ulib/storage/operation",
+      "$zx/system/ulib/zircon-internal",
+      "$zx/system/ulib/zx",
+    ]
+  } else {
+    sources = [
+      "block_transaction.cc",
+      "block_transaction_host.cc",
+      "buffered_operations_builder_host.cc",
+    ]
+
+    deps = [
+      "$zx/system/ulib/fbl",
+      "$zx/system/ulib/storage/operation",
+      "$zx/system/ulib/zircon",
+    ]
+  }
+}

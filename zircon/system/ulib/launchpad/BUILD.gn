@@ -1,0 +1,35 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+zx_library("launchpad") {
+  sdk = "shared"
+  sdk_headers = [
+    "launchpad/vmo.h",
+    "launchpad/launchpad.h",
+  ]
+  shared = true
+  sources = [
+    "elf.c",
+    "fdio.c",
+    "launchpad.c",
+    "vmo.c",
+  ]
+  deps = [
+    "$zx/system/ulib/elf-psabi",
+    "$zx/system/ulib/elfload",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/fidl",
+    "$zx/system/ulib/ldmsg",
+    "$zx/system/ulib/zircon",
+    "$zx/system/ulib/zircon-internal",
+  ]
+  visibility = [
+    # Do not add anymore targets to this list.
+    # Instead of launchpad, use fdio_spawn or fuchsia.process.Launcher.
+    ":*",
+    "test:*",
+    "$zx/system/core/bootsvc:*",
+    "$zx/system/ulib:*",
+  ]
+}

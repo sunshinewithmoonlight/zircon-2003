@@ -1,0 +1,47 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+zx_library("hwreg") {
+  sdk = "source"
+  sdk_headers = [
+    "hwreg/asm.h",
+    "hwreg/bitfields.h",
+    "hwreg/indirect.h",
+    "hwreg/internal.h",
+    "hwreg/mmio.h",
+  ]
+  kernel = true
+  static = true
+  host = true
+  sources = [ "printers.cc" ]
+  if (!is_kernel) {
+    sources += [ "asm.cc" ]
+  }
+
+  public_deps = [
+    # <hwreg/internal.h> has #include <fbl/algorithm.h>.
+    "$zx/system/ulib/fbl:headers",
+  ]
+}
+
+zx_library("hwreg-i2c") {
+  sdk = "source"
+  sdk_headers = [
+    "hwreg/bitfields.h",
+    "hwreg/indirect.h",
+    "hwreg/internal.h",
+    "hwreg/i2c.h",
+  ]
+  kernel = true
+  static = true
+  sources = [ "printers.cc" ]
+
+  public_deps = [
+    # <hwreg/i2c.h> has #include <lib/device-protocol/i2c.h>.
+    "$zx/system/dev/lib/device-protocol-i2c:headers",
+
+    # <hwreg/internal.h> has #include <fbl/algorithm.h>.
+    "$zx/system/ulib/fbl:headers",
+  ]
+}

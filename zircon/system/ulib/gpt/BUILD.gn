@@ -1,0 +1,33 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+zx_library("gpt") {
+  sdk = "source"
+  sdk_headers = [
+    "gpt/c/gpt.h",
+    "gpt/cros.h",
+    "gpt/gpt.h",
+    "gpt/guid.h",
+  ]
+  sources = [
+    "cros.cc",
+    "gpt.cc",
+    "guid.cc",
+  ]
+  public_deps = [ "$zx/system/ulib/fbl:headers" ]
+  deps = [
+    "$zx/system/fidl/fuchsia-hardware-block:c",
+    "$zx/system/ulib/fit",
+    "$zx/system/ulib/fzl",
+    "$zx/system/ulib/mbr",
+    "$zx/system/ulib/range",
+    "$zx/system/ulib/zircon",
+    "$zx/third_party/ulib/cksum",
+  ]
+
+  # TODO(41890): UBSan has found an instance of undefined behavior in this target.
+  # Disable UBSan for this target temporarily until it is migrated into CI/CQ.
+  configs +=
+      [ "$zx_build/public/gn/config:temporarily_disable_ubsan_do_not_use" ]
+}

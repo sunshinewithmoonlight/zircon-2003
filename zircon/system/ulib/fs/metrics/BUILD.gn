@@ -1,0 +1,78 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# Metrics which depend on cobalt only.
+zx_library("metrics-cobalt") {
+  sdk = "source"
+  sdk_headers = [
+    "fs/metrics/cobalt_metrics.h",
+  ]
+  sources = [ "cobalt_metrics.cc" ]
+  public_deps = [
+    "$zx/system/ulib/cobalt-client:headers",
+    "$zx/system/ulib/fbl:headers",
+  ]
+  deps = [
+    "$zx/system/ulib/cobalt-client",
+    "$zx/system/ulib/fbl",
+  ]
+}
+
+# Metrics which are logged by inspect vmo only.
+zx_library("metrics-inspect") {
+  sdk = "source"
+  sdk_headers = [
+    "fs/metrics/events.h",
+    "fs/metrics/histograms.h",
+    "fs/metrics/internal",
+    "fs/metrics/internal/object_generator.h",
+    "fs/metrics/internal/object_offsets.h",
+    "fs/metrics/internal/offsets.h",
+    "fs/metrics/internal/attributes.h",
+  ]
+  sources = [ "histograms.cc" ]
+  public_deps = [
+    "$zx/system/ulib/fbl:headers",
+    "$zx/system/ulib/fzl:headers",
+    "$zx/system/ulib/inspect:headers",
+    "$zx/system/ulib/zx:headers",
+  ]
+  deps = [
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fzl",
+    "$zx/system/ulib/inspect",
+    "$zx/system/ulib/zx",
+  ]
+  configs += [ "$zx/public/gn/config:Wno-unused-function" ]
+}
+
+# Helper library that uses both cobalt and inspect to record metrics.
+# TODO(ZX-3150): Remove once inspect broker service is complete.
+zx_library("metrics-composite-latency-event") {
+  sdk = "source"
+  sdk_headers = [
+    "fs/metrics/composite_latency_event.h",
+  ]
+  sources = [ "composite_latency_event.cc" ]
+  public_deps = [
+    "$zx/system/ulib/cobalt-client:headers",
+    "$zx/system/ulib/fs/metrics:metrics-cobalt.headers",
+    "$zx/system/ulib/fs/metrics:metrics-inspect.headers",
+  ]
+  deps = [
+    "$zx/system/ulib/cobalt-client",
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fs/metrics:metrics-cobalt",
+    "$zx/system/ulib/fs/metrics:metrics-inspect",
+  ]
+}
+
+# Group of all metric targets.
+group("metrics") {
+  deps = [
+    ":metrics-cobalt",
+    ":metrics-composite-latency-event",
+    ":metrics-inspect",
+  ]
+}

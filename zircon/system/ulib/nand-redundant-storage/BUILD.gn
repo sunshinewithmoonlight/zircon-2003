@@ -1,0 +1,32 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# MTD Redundant Storage (mtd-rs)
+#
+# This library requires an environment with mtd/mtd-user.h and MTD support.
+
+zx_library("nand-redundant-storage") {
+  sdk = "source"
+  sdk_headers = [
+    "lib/nand-redundant-storage/nand-redundant-storage-interface.h",
+    "lib/nand-redundant-storage/nand-redundant-storage.h",
+  ]
+  host = true
+
+  if (current_os == "linux") {
+    sources = [
+      "file-nand-rs.cc",
+      "nand-rs-header.cc",
+      "nand-rs.cc",
+    ]
+  }
+
+  public_deps = [ "$zx/system/ulib/mtd:headers" ]
+
+  deps = [
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/mtd",
+    "$zx/third_party/ulib/cksum",
+  ]
+}

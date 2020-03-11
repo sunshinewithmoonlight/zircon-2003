@@ -1,0 +1,67 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+##########################################
+# Though under //zircon, this build file #
+# is meant to be used in the Fuchsia GN  #
+# build.                                 #
+# See fxb/36548.                         #
+##########################################
+
+assert(!defined(zx) || zx != "/",
+       "This file can only be used in the Fuchsia GN build.")
+
+import("//build/unification/zx_library.gni")
+
+zx_library("fvm-host") {
+  sdk = "source"
+  sdk_headers = [
+    "fvm-host/file-wrapper.h",
+    "fvm-host/container.h",
+    "fvm-host/format.h",
+    "fvm-host/fvm-info.h",
+    "fvm-host/sparse-paver.h",
+  ]
+  host = true
+  sources = [
+    "container/container.cc",
+    "container/fvm.cc",
+    "container/sparse.cc",
+    "file-wrapper.cc",
+    "format.cc",
+    "format/blobfs.cc",
+    "format/format.cc",
+    "format/minfs.cc",
+    "fvm-info.cc",
+    "sparse-paver.cc",
+  ]
+  public_deps = [
+    # <fvm/format.h> has #include <fs-management/mount.h> though that
+    # library is not really meant for host code.
+    "//zircon/public/lib/fs-management",
+
+    # <fvm-host/format.h> has #include <blobfs/format.h>.
+    "//zircon/public/lib/blobfs",
+
+    # <fvm-host/format.h> has #include <minfs/bcache.h>.
+    "//zircon/public/lib/minfs",
+
+    # <fvm-host/container.h> has #include <fvm/sparse-reader.h>.
+    "//zircon/public/lib/fvm",
+  ]
+  deps = [
+    "//zircon/public/lib/blobfs",
+    "//zircon/public/lib/digest",
+    "//zircon/public/lib/fbl",
+    "//zircon/public/lib/fit",
+    "//zircon/public/lib/fs",
+    "//zircon/public/lib/transaction",
+    "//zircon/public/lib/fvm",
+    "//zircon/public/lib/minfs",
+    "//third_party/boringssl",
+    "//zircon/public/lib/cksum",
+    "//zircon/public/lib/lz4",
+    "//zircon/public/lib/safemath",
+  ]
+}

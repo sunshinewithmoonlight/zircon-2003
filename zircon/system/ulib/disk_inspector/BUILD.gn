@@ -1,0 +1,47 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+zx_library("disk_inspector") {
+  sdk = "source"
+  sdk_headers = [
+    "disk_inspector/inspector_transaction_handler.h",
+    "disk_inspector/command_handler.h",
+    "disk_inspector/command.h",
+    "disk_inspector/common_types.h",
+    "disk_inspector/disk_inspector.h",
+    "disk_inspector/disk_obj.h",
+    "disk_inspector/disk_struct.h",
+    "disk_inspector/supported_types.h",
+    "disk_inspector/type_utils.h",
+  ]
+  static = true
+  sources = [
+    "command.cc",
+    "disk_inspector.cc",
+    "disk_struct.cc",
+  ]
+
+  public_deps = [ "$zx/system/ulib/fbl:headers" ]
+  deps = [ "$zx/system/ulib/fbl" ]
+
+  if (is_fuchsia) {
+    sources += [ "inspector_transaction_handler.cc" ]
+
+    public_deps += [
+      "$zx/system/ulib/block-client:headers",
+      "$zx/system/ulib/fit:headers",
+      "$zx/system/ulib/fs:headers",
+      "$zx/system/ulib/fs/transaction:headers",
+      "$zx/system/ulib/storage/buffer:headers",
+    ]
+
+    deps += [
+      "$zx/system/ulib/fdio",
+      "$zx/system/ulib/fit",
+      "$zx/system/ulib/storage/operation",
+      "$zx/system/ulib/zircon",
+      "$zx/third_party/ulib/safemath",
+    ]
+  }
+}

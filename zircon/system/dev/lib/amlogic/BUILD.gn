@@ -1,0 +1,65 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+zx_library("amlogic") {
+  sdk = "source"
+  sdk_headers = [
+    "soc/aml-a113/a113-clocks.h",
+    "soc/aml-a113/a113-gpio.h",
+    "soc/aml-a113/a113-hw.h",
+    "soc/aml-a113/a113-pwm.h",
+    "soc/aml-a113/a113-tdm.h",
+    "soc/aml-common/aml-audio-regs.h",
+    "soc/aml-common/aml-g12-reset.h",
+    "soc/aml-common/aml-gpu.h",
+    "soc/aml-common/aml-guid.h",
+    "soc/aml-common/aml-pdm-audio.h",
+    "soc/aml-common/aml-pdm-regs.h",
+    "soc/aml-common/aml-rawnand.h",
+    "soc/aml-common/aml-sd-emmc.h",
+    "soc/aml-common/aml-tdm-audio.h",
+    "soc/aml-common/aml-thermal.h",
+    "soc/aml-common/aml-usb-phy.h",
+    "soc/aml-meson/aml-clk-common.h",
+    "soc/aml-meson/axg-clk.h",
+    "soc/aml-meson/g12a-clk.h",
+    "soc/aml-meson/g12b-clk.h",
+    "soc/aml-meson/gxl-clk.h",
+    "soc/aml-s905/s905-gpio.h",
+    "soc/aml-s905d2/aml-mali.h",
+    "soc/aml-s905d2/sd905d2-gpio.h",
+    "soc/aml-s905d2/sd905d2-hiu-regs.h",
+    "soc/aml-s905d2/sd905d2-hiu.h",
+    "soc/aml-s905d2/sd905d2-hw.h",
+    "soc/aml-s905d2/sd905d2-pwm.h",
+    "soc/aml-s905d3/sd905d3-hw.h",
+    "soc/aml-s905x/sd905x-gpio.h",
+    "soc/aml-s912/sd912-audio.h",
+    "soc/aml-s912/sd912-gpio.h",
+    "soc/aml-s912/sd912-hw.h",
+    "soc/aml-t931/t931-gpio.h",
+    "soc/aml-t931/t931-hw.h",
+    "soc/aml-t931/t931-pwm.h",
+    "soc/aml-t931/t931-spi.h",
+  ]
+  sources = [
+    "a113-clocks.c",
+    "aml-pdm-audio.cc",
+    "aml-tdm-audio.cc",
+    "s905d2-hiu.c",
+    "s905d2-pll-rates.c",
+  ]
+  deps = [
+    "$zx/system/banjo/ddk.protocol.platform.bus",
+    "$zx/system/banjo/ddk.protocol.platform.device",
+    "$zx/system/dev/lib/mmio",
+    "$zx/system/ulib/ddk",
+    "$zx/system/ulib/ddktl",
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fzl",
+    "$zx/system/ulib/sync",
+    "$zx/system/ulib/zircon",
+    "$zx/system/ulib/zx",
+  ]
+}

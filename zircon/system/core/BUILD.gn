@@ -1,0 +1,27 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+group("core") {
+  # bootsvc is the first real user process, and it launches everything else.
+  # So it's the only "core" direct dependency and it has data_deps for the
+  # other binaries it launches.
+  deps = [
+    "bootsvc",
+
+    # TODO(teisenbe): Find a better place to hook these into the dependency graph
+    "console",
+    "ptysvc",
+    "sysinfo",
+
+    # TODO(bwb): depend on these from GN when build systems are unified. These are
+    # data dependencies of devcoordinator
+    "$zx/system/core/devmgr/component",
+    "$zx/system/core/devmgr/fshost",
+    "$zx/system/core/miscsvc",
+    "$zx/system/core/netsvc",
+    "$zx/system/core/netsvc:device-name-provider",
+    "$zx/system/core/pwrbtn-monitor",
+    "$zx/system/core/svchost",
+  ]
+}

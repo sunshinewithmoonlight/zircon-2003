@@ -1,0 +1,48 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+zx_library("inspect") {
+  sdk = "source"
+  sdk_publishable = true
+  sdk_headers = [
+    "lib/inspect/cpp/inspect.h",
+    "lib/inspect/cpp/inspector.h",
+    "lib/inspect/cpp/hierarchy.h",
+    "lib/inspect/cpp/reader.h",
+    "lib/inspect/cpp/health.h",
+    "lib/inspect/cpp/value_list.h",
+    "lib/inspect/cpp/vmo/state.h",
+    "lib/inspect/cpp/vmo/types.h",
+    "lib/inspect/cpp/vmo/block.h",
+    "lib/inspect/cpp/vmo/heap.h",
+    "lib/inspect/cpp/vmo/limits.h",
+    "lib/inspect/cpp/vmo/scanner.h",
+    "lib/inspect/cpp/vmo/snapshot.h",
+  ]
+  sources = [
+    "health.cc",
+    "hierarchy.cc",
+    "inspector.cc",
+    "reader.cc",
+    "vmo/heap.cc",
+    "vmo/scanner.cc",
+    "vmo/snapshot.cc",
+    "vmo/state.cc",
+    "vmo/types.cc",
+  ]
+
+  public_deps = [
+    "$zx/system/ulib/async:headers",
+    "$zx/system/ulib/fit:headers",
+    "$zx/system/ulib/zx:headers",
+  ]
+
+  deps = [
+    "$zx/system/ulib/async",
+    "$zx/system/ulib/async:async-default",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/fit",
+    "$zx/system/ulib/zx",
+  ]
+}

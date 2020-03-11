@@ -1,0 +1,39 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+group("netprotocol") {
+  deps = [
+    ":netaddr",
+    ":netcp",
+    ":netls",
+    ":netruncmd",
+  ]
+}
+
+source_set("common") {
+  sources = [ "netprotocol.c" ]
+}
+
+zx_host_tool("netruncmd") {
+  sources = [ "netruncmd.c" ]
+  deps = [ ":common" ]
+}
+
+zx_host_tool("netcp") {
+  sources = [ "netcp.c" ]
+  deps = [
+    ":common",
+    "$zx/system/ulib/tftp",
+  ]
+}
+
+zx_host_tool("netls") {
+  sources = [ "netls.c" ]
+  deps = [ ":common" ]
+}
+
+zx_host_tool("netaddr") {
+  sources = [ "netaddr.c" ]
+  deps = [ ":common" ]
+}

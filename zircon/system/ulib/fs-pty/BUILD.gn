@@ -1,0 +1,36 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("$zx_build/public/gn/package.gni")
+
+zx_library("fs-pty") {
+  sdk = "source"
+  sdk_headers = [
+    "lib/fs-pty/tty-connection-internal.h",
+    "lib/fs-pty/service.h",
+  ]
+  static = true
+
+  sources = [
+    "include/lib/fs-pty/service.h",
+    "include/lib/fs-pty/tty-connection-internal.h",
+    "service.cc",
+  ]
+  include_dirs = [ "include" ]
+  public_deps = [
+    "$zx/system/fidl/fuchsia-hardware-pty:llcpp",
+    "$zx/system/fidl/fuchsia-io:llcpp",
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fit",
+    "$zx/system/ulib/fs",
+    "$zx/system/ulib/zx",
+  ]
+
+  deps = [
+    "$zx/system/fidl/fuchsia-io:llcpp",
+    "$zx/system/ulib/fidl-async:fidl-async-cpp",
+    "$zx/system/ulib/fs",
+    "$zx/system/ulib/zircon",
+  ]
+}

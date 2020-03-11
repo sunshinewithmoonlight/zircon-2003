@@ -1,0 +1,62 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+##########################################
+# Though under //zircon, this build file #
+# is meant to be used in the Fuchsia GN  #
+# build.                                 #
+# See fxb/36139.                         #
+##########################################
+
+assert(!defined(zx) || zx != "/",
+       "This file can only be used in the Fuchsia GN build.")
+
+import("//build/test.gni")
+import("//build/unification/images/migrated_manifest.gni")
+
+group("test") {
+  testonly = true
+  deps = [ ":zxio" ]
+}
+
+test("zxio") {
+  # Dependent manifests unfortunately cannot be marked as `testonly`.
+  # Remove when converting this file to proper GN build idioms.
+  testonly = false
+  configs += [ "//build/unification/config:zircon-migrated" ]
+  sources = [
+    "c-compilation-test.c",
+    "debuglog-test.cc",
+    "dir_v2-test.cc",
+    "dirent-test.cc",
+    "extensions-test.cc",
+    "file-test.cc",
+    "file_test_suite.cc",
+    "file_test_suite.h",
+    "file_v2-test.cc",
+    "null-test.cc",
+    "posix-mode-test.cc",
+    "remote_v2-test.cc",
+    "vmo-test.cc",
+    "vmofile-test.cc",
+    "zxio-test.cc",
+  ]
+  deps = [
+    "//zircon/public/lib/async-loop-cpp",
+    "//zircon/public/lib/async-loop-default",
+    "//zircon/public/lib/fdio",
+    "//zircon/public/lib/fidl-async-cpp",
+    "//zircon/public/lib/sync",
+    "//zircon/public/lib/zx",
+    "//zircon/public/lib/zxio",
+    "//zircon/public/lib/zxtest",
+    "//zircon/system/fidl/fuchsia-boot:c",
+    "//zircon/system/fidl/fuchsia-io:llcpp",
+    "//zircon/system/fidl/fuchsia-io2:llcpp",
+  ]
+}
+
+migrated_manifest("zxio-manifest") {
+  deps = [ ":zxio" ]
+}

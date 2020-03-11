@@ -1,0 +1,33 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+zx_library("mt8167") {
+  sdk = "source"
+  sdk_headers = [
+    "soc/mt8167/mt8167-audio-in.h",
+    "soc/mt8167/mt8167-audio-out.h",
+    "soc/mt8167/mt8167-audio-regs.h",
+    "soc/mt8167/mt8167-clk-regs.h",
+    "soc/mt8167/mt8167-clk.h",
+    "soc/mt8167/mt8167-gpio.h",
+    "soc/mt8167/mt8167-hw.h",
+    "soc/mt8167/mt8167-power-regs.h",
+    "soc/mt8167/mt8167-power.h",
+    "soc/mt8167/mt8167-sdmmc.h",
+    "soc/mt8167/mt8167-usb-phy.h",
+    "soc/mt8167/mt8167-usb.h",
+  ]
+  sources = [
+    "mt8167-audio-in.cc",
+    "mt8167-audio-out.cc",
+  ]
+  deps = [
+    "$zx/system/dev/lib/mmio",
+    "$zx/system/ulib/ddk",
+    "$zx/system/ulib/ddktl",
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/hwreg",
+    "$zx/system/ulib/zx",
+  ]
+}

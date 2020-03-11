@@ -1,0 +1,49 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# Named to avoid conflicts with storage/buffer/test_support:
+zx_library("fs_test_support") {
+  static = true
+  sdk = "source"
+  testonly = true
+
+  sources = [
+    "environment.cc",
+    "fixtures.cc",
+    "test_support.cc",
+  ]
+  sdk_headers = [
+    "fs/test_support/environment.h",
+    "fs/test_support/fixtures.h",
+    "fs/test_support/test_support.h",
+  ]
+
+  public_deps = [
+    "$zx/system/fidl/fuchsia-io:llcpp",
+    "$zx/system/ulib/devmgr-integration-test:headers",
+    "$zx/system/ulib/fbl:headers",
+    "$zx/system/ulib/fs-management:headers",
+    "$zx/system/ulib/fs/transaction:headers",
+    "$zx/system/ulib/ramdevice-client:headers",
+    "$zx/system/ulib/storage/buffer/test_support:headers",
+    "$zx/system/ulib/zxtest:headers",
+  ]
+
+  deps = [
+    "$zx/system/fidl/fuchsia-device:llcpp",
+    "$zx/system/fidl/fuchsia-hardware-block:c",
+    "$zx/system/ulib/devmgr-integration-test",
+    "$zx/system/ulib/devmgr-launcher",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/fdio-caller",
+    "$zx/system/ulib/fs-management",
+    "$zx/system/ulib/fs/transaction",
+    "$zx/system/ulib/fvm",
+    "$zx/system/ulib/fzl",
+    "$zx/system/ulib/ramdevice-client",
+    "$zx/system/ulib/storage/buffer/test_support",
+    "$zx/system/ulib/zircon",
+    "$zx/system/ulib/zxtest",
+  ]
+}

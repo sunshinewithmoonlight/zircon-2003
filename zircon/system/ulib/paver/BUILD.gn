@@ -1,0 +1,55 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+zx_library("paver") {
+  sdk = "source"
+  sdk_headers = [ "lib/paver/provider.h" ]
+  sources = [
+    "abr-client.cc",
+    "abr.cc",
+    "device-partitioner.cc",
+    "fvm.cc",
+    "partition-client.cc",
+    "paver.cc",
+    "provider.cc",
+    "stream-reader.cc",
+    "validation.cc",
+  ]
+  deps = [
+    "$zx/system/dev/lib/amlogic:amlogic.headers",
+    "$zx/system/fidl/fuchsia-boot:llcpp",
+    "$zx/system/fidl/fuchsia-device:llcpp",
+    "$zx/system/fidl/fuchsia-hardware-block:llcpp",
+    "$zx/system/fidl/fuchsia-hardware-block-encrypted:llcpp",
+    "$zx/system/fidl/fuchsia-hardware-block-partition:llcpp",
+    "$zx/system/fidl/fuchsia-hardware-block-volume:llcpp",
+    "$zx/system/fidl/fuchsia-hardware-skipblock:llcpp",
+    "$zx/system/fidl/fuchsia-paver:llcpp",
+    "$zx/system/fidl/fuchsia-sysinfo:llcpp",
+    "$zx/system/ulib/block-client",
+    "$zx/system/ulib/chromeos-disk-setup",
+    "$zx/system/ulib/ddk",
+    "$zx/system/ulib/digest",
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/fdio-caller",
+    "$zx/system/ulib/fidl",
+    "$zx/system/ulib/fidl-async:fidl-async-cpp",
+    "$zx/system/ulib/fs",
+    "$zx/system/ulib/fs-management",
+    "$zx/system/ulib/fvm",
+    "$zx/system/ulib/fzl",
+    "$zx/system/ulib/gpt",
+    "$zx/system/ulib/ramdevice-client:ramdevice-client-static",
+    "$zx/system/ulib/svc",
+    "$zx/system/ulib/sync",
+    "$zx/system/ulib/sysconfig-client:sysconfig-sync-client",
+    "$zx/system/ulib/zircon",
+    "$zx/system/ulib/zircon-crypto",
+    "$zx/system/ulib/zx",
+    "$zx/system/ulib/zxcrypt:zxcrypt-fdio",
+    "$zx/third_party/ulib/cksum",
+  ]
+  public_deps = [ "$zx/system/ulib/svc:headers" ]
+}

@@ -1,0 +1,38 @@
+# Copyright 2019 The Fuchsia Authors
+#
+# Use of this source code is governed by a MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT
+
+source_set("libc") {
+  sources = [
+    "atomic.cc",
+    "cxa_atexit.cc",
+    "cxa_pure_virtual.cc",
+    "cxx_allocator.cc",
+    "fprintf.cc",
+    "printf.cc",
+    "rand.cc",
+    "snprintf.cc",
+    "strtol.cc",
+    "strtoul.cc",
+  ]
+  deps = [
+    ":ctype",
+    ":tests",
+    "$zx/kernel/lib/heap",
+    "$zx/kernel/lib/io",
+    "$zx/kernel/lib/ktl",
+    "string",
+  ]
+}
+
+source_set("ctype") {
+  sources = [ "ctype.cc" ]
+}
+
+source_set("tests") {
+  # TODO: testonly = true
+  sources = [ "atomic_tests.cc" ]
+  deps = [ "$zx/kernel/lib/unittest" ]
+}

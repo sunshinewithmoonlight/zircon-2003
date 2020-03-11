@@ -1,0 +1,113 @@
+# Copyright 2020 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+##########################################
+# Though under //zircon, this build file #
+# is meant to be used in the Fuchsia GN  #
+# build.                                 #
+# See fxb/36139.                         #
+##########################################
+
+assert(!defined(zx) || zx != "/",
+       "This file can only be used in the Fuchsia GN build.")
+
+import("//build/fuzzing/fuzzer.gni")
+import("//build/test.gni")
+import("//build/unification/images/migrated_manifest.gni")
+
+group("test") {
+  testonly = true
+  deps = [ ":paver-test" ]
+}
+
+test("paver-test") {
+  # Dependent manifests unfortunately cannot be marked as `testonly`.
+  # TODO(44278): Remove when converting this file to proper GN build idioms.
+  if (is_fuchsia) {
+    testonly = false
+  }
+  if (is_fuchsia) {
+    configs += [ "//build/unification/config:zircon-migrated" ]
+  }
+  if (is_fuchsia) {
+    fdio_config = [ "//build/config/fuchsia:fdio_config" ]
+    if (configs + fdio_config - fdio_config != configs) {
+      configs -= fdio_config
+    }
+  }
+  output_name = "paver-test"
+  sources = [
+    "abr-test.cc",
+    "device-partitioner-test.cc",
+    "fvm-test.cc",
+    "partition-client-test.cc",
+    "paversvc-test.cc",
+    "stream-reader-test.cc",
+    "test-utils.cc",
+    "validation-test.cc",
+  ]
+  include_dirs = [
+    "//zircon/public/lib/paver",
+    "..",
+  ]
+  deps = [
+    "//zircon/public/lib/amlogic",
+    "//zircon/public/lib/async",
+    "//zircon/public/lib/async-loop-cpp",
+    "//zircon/public/lib/async-loop-default",
+    "//zircon/public/lib/block-client",
+    "//zircon/public/lib/cksum",
+    "//zircon/public/lib/devmgr-integration-test",
+    "//zircon/public/lib/driver-integration-test",
+    "//zircon/public/lib/fbl",
+    "//zircon/public/lib/fdio-caller",
+    "//zircon/public/lib/fidl-async-cpp",
+    "//zircon/public/lib/fidl-utils",
+    "//zircon/public/lib/fs",
+    "//zircon/public/lib/fs-management",
+    "//zircon/public/lib/fvm",
+    "//zircon/public/lib/fzl",
+    "//zircon/public/lib/gpt",
+    "//zircon/public/lib/paver",
+    "//zircon/public/lib/ramdevice-client-static",
+    "//zircon/public/lib/svc",
+    "//zircon/public/lib/sysconfig-sync-client",
+    "//zircon/public/lib/zxtest",
+    "//zircon/system/fidl/fuchsia-boot:llcpp",
+    "//zircon/system/fidl/fuchsia-device:llcpp",
+    "//zircon/system/fidl/fuchsia-hardware-block:llcpp",
+    "//zircon/system/fidl/fuchsia-hardware-block-partition:llcpp",
+    "//zircon/system/fidl/fuchsia-hardware-nand:c",
+    "//zircon/system/fidl/fuchsia-hardware-skipblock:llcpp",
+    "//zircon/system/fidl/fuchsia-paver:llcpp",
+  ]
+}
+
+migrated_manifest("paver-test-manifest") {
+  deps = [ ":paver-test" ]
+}
+
+fuzzer("paver-validation-fuzzer") {
+  sources = [ "validation-fuzzer.cc" ]
+
+  deps = [
+    "//zircon/public/lib/block-client",
+    "//zircon/public/lib/fbl",
+    "//zircon/public/lib/fdio-caller",
+    "//zircon/public/lib/gpt",
+    "//zircon/public/lib/paver",
+    "//zircon/public/lib/svc",
+    "//zircon/public/lib/sysconfig-sync-client",
+    "//zircon/system/fidl/fuchsia-boot:llcpp.headers",
+    "//zircon/system/fidl/fuchsia-device:llcpp.headers",
+    "//zircon/system/fidl/fuchsia-hardware-block:llcpp.headers",
+    "//zircon/system/fidl/fuchsia-hardware-skipblock:llcpp.headers",
+    "//zircon/system/fidl/fuchsia-paver:llcpp.headers",
+  ]
+
+  include_dirs = [
+    "//zircon/public/lib/paver",
+    "..",
+  ]
+}

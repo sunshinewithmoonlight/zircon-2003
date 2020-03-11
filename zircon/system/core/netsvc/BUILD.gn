@@ -1,0 +1,149 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("$zx/public/gn/config/product_parameters.gni")
+
+zx_executable("netsvc") {
+  sources = [
+    "debuglog.cc",
+    "netsvc.cc",
+  ]
+  if (enable_netsvc_debugging_features) {
+    sources += [ "debug-command-enabled.cc" ]
+  } else {
+    sources += [ "debug-command-disabled.cc" ]
+  }
+  deps = [
+    ":args",
+    ":netsvc_common",
+    "$zx/system/fidl/fuchsia-device:llcpp",
+    "$zx/system/fidl/fuchsia-hardware-ethernet:c",
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/fdio-caller",
+    "$zx/system/ulib/inet6",
+    "$zx/system/ulib/sync",
+    "$zx/system/ulib/tftp",
+    "$zx/system/ulib/zircon",
+    "$zx/system/ulib/zx",
+  ]
+  data_deps = [
+    # netsvc launches /boot/bin/sh for netruncmd.
+    "$zx/third_party/uapp/dash",
+  ]
+}
+
+zx_executable("device-name-provider") {
+  sources = [ "device-name-provider.cc" ]
+  deps = [
+    ":args",
+    "$zx/system/fidl/fuchsia-device:llcpp",
+    "$zx/system/ulib/async-loop:async-loop-cpp",
+    "$zx/system/ulib/async-loop:async-loop-default.static",
+    "$zx/system/ulib/fidl-async:fidl-async-cpp",
+    "$zx/system/ulib/fs",
+    "$zx/system/ulib/inet6:netifc-discover",
+    "$zx/system/ulib/svc",
+  ]
+}
+
+source_set("args") {
+  sources = [ "args.cc" ]
+}
+
+source_set("netsvc_common") {
+  sources = [
+    "board-info.cc",
+    "file-api.cc",
+    "netboot.cc",
+    "netcp.cc",
+    "paver.cc",
+    "payload-streamer.cc",
+    "tftp.cc",
+    "zbi.cc",
+  ]
+  deps = [
+    "$zx/system/fidl/fuchsia-boot:c",
+    "$zx/system/fidl/fuchsia-device:llcpp",
+    "$zx/system/fidl/fuchsia-device-manager:c",
+    "$zx/system/fidl/fuchsia-hardware-block:llcpp",
+    "$zx/system/fidl/fuchsia-kernel:c",
+    "$zx/system/fidl/fuchsia-sysinfo:llcpp",
+    "$zx/system/ulib/async-loop:async-loop-cpp",
+    "$zx/system/ulib/async-loop:async-loop-default.static",
+    "$zx/system/ulib/bootfs",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/fdio-caller",
+    "$zx/system/ulib/fidl-async:fidl-async-cpp",
+    "$zx/system/ulib/gpt",
+    "$zx/system/ulib/libzbi",
+    "$zx/system/ulib/sysconfig-client:sysconfig-sync-client",
+    "$zx/system/ulib/zircon",
+  ]
+  public_deps = [
+    "$zx/system/fidl/fuchsia-paver:llcpp",
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fzl",
+    "$zx/system/ulib/inet6",
+    "$zx/system/ulib/sync",
+    "$zx/system/ulib/tftp",
+    "$zx/system/ulib/zx",
+  ]
+
+  # TODO(45621): UBSan has found an instance of undefined behavior in this target.
+  # Disable UBSan for this target temporarily until it is migrated into CI/CQ.
+  configs += [ "$zx/public/gn/config:temporarily_disable_ubsan_do_not_use" ]
+}
+
+zx_test("netsvc-test") {
+  output_name = "netsvc-test"
+  sources = [
+    "test/args-test.cc",
+    "test/file-api-test.cc",
+    "test/paver-test.cc",
+    "test/payload-streamer-test.cc",
+    "test/tftp-test.cc",
+  ]
+  include_dirs = [ "." ]
+  deps = [
+    ":args",
+    ":netsvc_common",
+    "$zx/system/fidl/fuchsia-device:llcpp",
+    "$zx/system/fidl/fuchsia-sysinfo:llcpp",
+    "$zx/system/ulib/async-loop:async-loop-cpp",
+    "$zx/system/ulib/async-loop:async-loop-default.static",
+    "$zx/system/ulib/devmgr-integration-test",
+    "$zx/system/ulib/driver-integration-test",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/fidl-async:fidl-async-cpp",
+    "$zx/system/ulib/fs",
+    "$zx/system/ulib/ramdevice-client",
+    "$zx/system/ulib/zircon",
+    "$zx/system/ulib/zx",
+    "$zx/system/ulib/zxtest",
+  ]
+  data_deps = [ ":netsvc" ]
+}
+
+zx_test("netsvc-stress-test") {
+  output_name = "netsvc-stress-test"
+  sources = [ "test/paver-stress-test.cc" ]
+  include_dirs = [ "." ]
+  deps = [
+    ":netsvc_common",
+    "$zx/system/fidl/fuchsia-device:llcpp",
+    "$zx/system/fidl/fuchsia-sysinfo:llcpp",
+    "$zx/system/ulib/async-loop:async-loop-cpp",
+    "$zx/system/ulib/devmgr-integration-test",
+    "$zx/system/ulib/driver-integration-test",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/fidl-async:fidl-async-cpp",
+    "$zx/system/ulib/fs",
+    "$zx/system/ulib/ramdevice-client",
+    "$zx/system/ulib/zircon",
+    "$zx/system/ulib/zx",
+    "$zx/system/ulib/zxtest",
+  ]
+  data_deps = [ ":netsvc" ]
+}

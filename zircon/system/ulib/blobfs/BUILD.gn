@@ -1,0 +1,144 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+zx_library("blobfs") {
+  host = true
+  sdk = "source"
+  sdk_headers = [
+    "blobfs/common.h",
+    "blobfs/host.h",
+    "blobfs/format.h",
+    "blobfs/mount.h",
+    "blobfs/host",
+    "blobfs/host/fsck.h",
+    "blobfs/node-finder.h",
+    "blobfs/fsck.h",
+    "blobfs/cache-policy.h",
+    "blobfs/mkfs.h",
+  ]
+  sources = [
+    "allocator/extent-reserver.cc",
+    "allocator/extent-reserver.h",
+    "allocator/node-reserver.cc",
+    "allocator/node-reserver.h",
+    "blobfs-checker.cc",
+    "common.cc",
+    "compression/compressor.h",
+    "compression/decompressor.cc",
+    "compression/decompressor.h",
+    "compression/lz4.cc",
+    "compression/lz4.h",
+    "compression/seekable-decompressor.h",
+    "compression/zstd-plain.cc",
+    "compression/zstd-plain.h",
+    "compression/zstd-seekable.cc",
+    "compression/zstd-seekable.h",
+    "iterator/allocated-extent-iterator.cc",
+    "iterator/allocated-extent-iterator.h",
+    "iterator/block-iterator-provider.h",
+    "iterator/block-iterator.cc",
+    "iterator/block-iterator.h",
+    "iterator/extent-iterator.h",
+    "iterator/vector-extent-iterator.cc",
+    "iterator/vector-extent-iterator.h",
+  ]
+  public_deps = [
+    "$zx/system/ulib/bitmap:headers",
+    "$zx/system/ulib/fs:headers",
+    "$zx/system/ulib/fs/journal:headers",
+    "$zx/system/ulib/fs/transaction:headers",
+    "$zx/system/ulib/range:headers",
+    "$zx/system/ulib/storage/buffer:headers",
+
+    # Seekable zstd include_dirs config required for all compilation units that incorporate it.
+    "$zx/third_party/ulib/zstd:zstdseek.headers",
+
+    # <blobfs/format.h> has #include <digest/digest.h>.
+    "$zx/system/ulib/digest:headers",
+  ]
+  deps = [
+    "$zx/system/ulib/bitmap",
+    "$zx/system/ulib/digest",
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fit",
+    "$zx/system/ulib/fs/journal",
+    "$zx/system/ulib/fs/transaction",
+    "$zx/system/ulib/fvm",
+    "$zx/system/ulib/id_allocator",
+    "$zx/system/ulib/range",
+    "$zx/system/ulib/storage/buffer",
+    "$zx/system/ulib/storage/operation",
+    "$zx/system/ulib/zircon-internal",
+    "$zx/third_party/ulib/cksum",
+    "$zx/third_party/ulib/lz4",
+    "$zx/third_party/ulib/safemath",
+    "$zx/third_party/ulib/uboringssl",
+    "$zx/third_party/ulib/zstd",
+    "$zx/third_party/ulib/zstd:zstdseek",
+  ]
+  if (is_fuchsia) {
+    sources += [
+      "allocator/allocator.cc",
+      "allocator/allocator.h",
+      "blob-cache.cc",
+      "blob-loader.cc",
+      "blob-verifier.cc",
+      "blob.cc",
+      "blobfs.cc",
+      "cache-node.cc",
+      "compression/blob-compressor.cc",
+      "compression/blob-compressor.h",
+      "directory.cc",
+      "format.cc",
+      "fsck.cc",
+      "iterator/node-populator.cc",
+      "iterator/node-populator.h",
+      "metrics.cc",
+      "mount.cc",
+      "pager/page-watcher.cc",
+      "pager/page-watcher.h",
+      "pager/user-pager.cc",
+      "pager/user-pager.h",
+      "query.cc",
+      "runner.cc",
+    ]
+    public_deps += [
+      "$zx/system/fidl/fuchsia-blobfs:llcpp.headers",
+      "$zx/system/ulib/block-client:headers",
+      "$zx/system/ulib/fs/metrics:metrics-cobalt.headers",
+      "$zx/system/ulib/fs/metrics:metrics-composite-latency-event.headers",
+      "$zx/system/ulib/fs/metrics:metrics-inspect.headers",
+    ]
+    deps += [
+      "$zx/system/fidl/fuchsia-blobfs:llcpp",
+      "$zx/system/fidl/fuchsia-fs:llcpp",
+      "$zx/system/fidl/fuchsia-io:llcpp",
+      "$zx/system/ulib/async",
+      "$zx/system/ulib/async:async-cpp",
+      "$zx/system/ulib/async:async-default",
+      "$zx/system/ulib/async-loop",
+      "$zx/system/ulib/async-loop:async-loop-cpp",
+      "$zx/system/ulib/async-loop:async-loop-default.static",
+      "$zx/system/ulib/block-client",
+      "$zx/system/ulib/fdio",
+      "$zx/system/ulib/fidl-async:fidl-async-cpp",
+      "$zx/system/ulib/fidl-utils",
+      "$zx/system/ulib/fs/metrics:metrics",
+      "$zx/system/ulib/fzl",
+      "$zx/system/ulib/sync",
+      "$zx/system/ulib/trace",
+      "$zx/system/ulib/trace-engine",
+      "$zx/system/ulib/trace-provider:trace-provider-with-fdio",
+      "$zx/system/ulib/zircon",
+      "$zx/system/ulib/zx",
+    ]
+  } else {
+    sources += [
+      "fsck-host.cc",
+      "host.cc",
+    ]
+    deps += [ "$zx/system/ulib/fs-host" ]
+  }
+  include_dirs = [ "." ]
+}

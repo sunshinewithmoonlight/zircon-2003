@@ -1,0 +1,70 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+##########################################
+# Though under //zircon, this build file #
+# is meant to be used in the Fuchsia GN  #
+# build.                                 #
+# See fxb/36548.                         #
+##########################################
+
+assert(!defined(zx) || zx != "/",
+       "This file can only be used in the Fuchsia GN build.")
+
+import("//build/unification/zx_library.gni")
+
+zx_library("fs-test-utils") {
+  sdk = "source"
+  sdk_headers = [
+    "fs-test-utils/blobfs/blobfs.h",
+    "fs-test-utils/blobfs/bloblist.h",
+    "fs-test-utils/fixture.h",
+    "fs-test-utils/perftest.h",
+    "fs-test-utils/unittest.h",
+  ]
+  testonly = true
+  sources = [
+    "blobfs/blobfs.cc",
+    "blobfs/bloblist.cc",
+    "fixture.cc",
+    "perftest.cc",
+  ]
+  public_deps = [
+    # <fs-test-utils/fixture.h> has #include <ramdevice-client/ramdisk.h>.
+    "//zircon/public/lib/ramdevice-client",
+
+    # <fs-test-utils/blobfs/bloblist.h> has #include <lib/zircon-internal/thread_annotations.h>.
+    "//zircon/public/lib/zircon-internal",
+  ]
+  deps = [
+    "//zircon/public/lib/async",
+    "//zircon/public/lib/async-cpp",
+    "//zircon/public/lib/async-default",
+    "//zircon/public/lib/async-loop",
+    "//zircon/public/lib/async-loop-cpp",
+    "//zircon/public/lib/async-loop-default",
+    "//zircon/public/lib/devmgr-integration-test",
+    "//zircon/public/lib/devmgr-launcher",
+    "//zircon/public/lib/digest",
+    "//zircon/public/lib/fbl",
+    "//zircon/public/lib/fdio",
+    "//zircon/public/lib/fdio-caller",
+    "//zircon/public/lib/fs",
+    "//zircon/public/lib/fs-management",
+    "//zircon/public/lib/fvm",
+    "//zircon/public/lib/fzl",
+    "//zircon/public/lib/gpt",
+    "//zircon/public/lib/memfs",
+    "//zircon/public/lib/memfs-cpp",
+    "//zircon/public/lib/perftest",
+    "//zircon/public/lib/ramdevice-client",
+    "//zircon/public/lib/sync",
+    "//zircon/public/lib/trace",
+    "//zircon/public/lib/trace-engine",
+    "//zircon/public/lib/unittest",
+    "//zircon/public/lib/zx",
+    "//zircon/system/fidl/fuchsia-device:c",
+    "//zircon/system/fidl/fuchsia-device:llcpp",
+  ]
+}

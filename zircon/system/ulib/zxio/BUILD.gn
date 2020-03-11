@@ -1,0 +1,42 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+zx_library("zxio") {
+  sdk = "static"
+  sdk_headers = [
+    "lib/zxio/extensions.h",
+    "lib/zxio/inception.h",
+    "lib/zxio/null.h",
+    "lib/zxio/ops.h",
+    "lib/zxio/types.h",
+    "lib/zxio/zxio.h",
+  ]
+  sources = [
+    "debuglog.cc",
+    "extensions.cc",
+    "get_vmo.cc",
+    "null.cc",
+    "pipe.cc",
+    "remote.cc",
+    "remote_v2/common_utils.cc",
+    "remote_v2/dirent_iterator.cc",
+    "remote_v2/remote_v2.cc",
+    "vmo.cc",
+    "vmofile.cc",
+    "zxio.cc",
+  ]
+  public_deps = [
+    "$zx/system/ulib/sync:headers",
+
+    # <lib/zxio/inception.h> has #include <fuchsia/io/llcpp/fidl.h>.
+    "$zx/system/fidl/fuchsia-io:llcpp.headers",
+  ]
+  deps = [
+    "$zx/system/fidl/fuchsia-io:llcpp",
+    "$zx/system/fidl/fuchsia-io2:llcpp",
+    "$zx/system/ulib/sync",
+    "$zx/system/ulib/zircon",
+    "$zx/system/ulib/zx",
+  ]
+}

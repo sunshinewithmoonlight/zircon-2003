@@ -1,0 +1,25 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+declare_args() {
+  # Controls which asserts are enabled.
+  #
+  # `ZX_ASSERT` is always enabled.
+  #
+  # * 0 disables standard C `assert()` and `ZX_DEBUG_ASSERT`.
+  # * 1 disables `ZX_DEBUG_ASSERT`. Standard C `assert()` remains enabled.
+  # * 2 enables all asserts.
+  assert_level = 2
+
+  # * -1 means really unoptimized (-O0), usually only build-tested and not run.
+  # * 0 means "optimized for debugging" (-Og), light enough to avoid confusion.
+  #   1, 2, and 3 are increasing levels of optimization.
+  # * 4 is optimized for space rather than purely for speed.
+  opt_level = 2
+
+  # * 0 means no debugging information.
+  # * 1 means minimal debugging information sufficient to symbolize backtraces.
+  # * 2 means full debugging information for use with a symbolic debugger.
+  symbol_level = 2
+}

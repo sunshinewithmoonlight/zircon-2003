@@ -1,0 +1,28 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("$zx/public/gn/resource.gni")
+import("$zx/public/gn/zbi.gni")
+
+zx_library("zbi-bootfs") {
+  sdk_headers = [ "zbi-bootfs/zbi-bootfs.h" ]
+  sdk = "shared"
+  shared = true
+
+  sources = [ "zbi-bootfs.cc" ]
+  public_deps = [
+    "$zx/system/fidl/fuchsia-hardware-skipblock:c",
+    "$zx/system/ulib/zx",
+  ]
+  deps = [
+    "$zx/system/fidl/fuchsia-io:c",
+    "$zx/system/ulib/bootfs",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/fdio-caller",
+    "$zx/system/ulib/fzl",
+    "$zx/system/ulib/hermetic-decompressor:headers",
+    "$zx/third_party/ulib/lz4",
+    "$zx/third_party/ulib/zstd",
+  ]
+}

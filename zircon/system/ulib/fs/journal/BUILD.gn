@@ -1,0 +1,72 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("$zx_build/public/gn/fuzzer.gni")
+
+zx_library("journal") {
+  sdk = "source"
+  sdk_headers = [
+    "fs/journal/background_executor.h",
+    "fs/journal/inspector_journal.h",
+    "fs/journal/format.h",
+    "fs/journal/initializer.h",
+    "fs/journal/header_view.h",
+    "fs/journal/data_streamer.h",
+    "fs/journal/superblock.h",
+    "fs/journal/replay.h",
+    "fs/journal/internal/inspector_parser.h",
+    "fs/journal/internal/journal_writer.h",
+    "fs/journal/internal/operation_tracker.h",
+    "fs/journal/journal.h",
+  ]
+  host = true
+  sources = [
+    "header_view.cc",
+    "initializer.cc",
+  ]
+  deps = [
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fit",
+    "$zx/third_party/ulib/cksum",
+  ]
+  static = true
+
+  if (is_fuchsia) {
+    sources += [
+      "background_executor.cc",
+      "data_streamer.cc",
+      "entry_view.cc",
+      "inspector/disk_struct.cc",
+      "inspector/inspector_parser.cc",
+      "inspector_journal.cc",
+      "inspector_journal_entries.cc",
+      "journal.cc",
+      "journal_writer.cc",
+      "operation_tracker.cc",
+      "replay.cc",
+      "replay_tree.cc",
+      "superblock.cc",
+    ]
+    public_deps = [
+      "$zx/system/ulib/disk_inspector:headers",
+      "$zx/system/ulib/fs:headers",
+      "$zx/system/ulib/fs/transaction:headers",
+      "$zx/system/ulib/fzl:headers",
+      "$zx/system/ulib/range:headers",
+      "$zx/system/ulib/storage/buffer:headers",
+      "$zx/system/ulib/storage/operation:headers",
+    ]
+    deps += [
+      "$zx/system/ulib/disk_inspector",
+      "$zx/system/ulib/fbl",
+      "$zx/system/ulib/fdio",
+      "$zx/system/ulib/fs/transaction",
+      "$zx/system/ulib/range",
+      "$zx/system/ulib/storage/buffer",
+      "$zx/system/ulib/storage/operation",
+      "$zx/system/ulib/sync",
+      "$zx/system/ulib/zircon",
+    ]
+  }
+}

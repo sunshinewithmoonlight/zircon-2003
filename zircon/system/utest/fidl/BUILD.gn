@@ -1,0 +1,108 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("$zx/public/gn/fidl.gni")
+
+if (is_fuchsia) {
+  source_set("common") {
+    testonly = true
+    visibility = [ ":*" ]
+    sources = [
+      "fidl_align_tests.cc",
+      "fidl_coded_types.cc",
+      "handle_closing_tests.cc",
+      "linearizing_tests.cc",
+      "llcpp_transaction_tests.cc",
+      "llcpp_types_tests.cc",
+      "llcpp_views_tests.cc",
+      "main.cc",
+      "on_error_handle_tests.cc",
+    ]
+    include_dirs = [ "generated" ]
+    public_deps = [
+      ":example.c",
+      ":fidl.test.coding.llcpp",
+      "$zx/system/ulib/fbl",
+      "$zx/system/ulib/fdio",
+      "$zx/system/ulib/fidl",
+      "$zx/system/ulib/fidl:fidl-llcpp",
+      "$zx/system/ulib/fit",
+      "$zx/system/ulib/unittest",
+      "$zx/system/ulib/zircon",
+      "$zx/system/ulib/zx",
+      "$zx/system/ulib/zxtest",
+    ]
+  }
+
+  # Run the common tests under a strict invalid handle policy
+  zx_executable("fidl-handle-policy-test-app") {
+    testonly = true
+    sources = []
+    deps = [ ":common" ]
+
+    # TODO(46873): Fix the leaks and remove this.
+    deps +=
+        [ "$zx/public/gn/config/instrumentation:suppress-lsan.DO-NOT-USE-THIS" ]
+  }
+
+  zx_test("fidl") {
+    sources = [
+      "abi_tests.cc",
+      "cpp_types_tests.cc",
+      "decoding_tests.cc",
+      "encoding_tests.cc",
+      "formatting_tests.cc",
+      "message_tests.cc",
+      "run_with_handle_policy_tests.cc",
+      "transformer_tests.c",
+      "validating_tests.cc",
+    ]
+    deps = [
+      ":common",
+      ":example.c",
+      ":fidl-handle-policy-test-app",
+    ]
+
+    # TODO(41897): UBSan has found an instance of undefined behavior in this target.
+    # Disable UBSan for this target temporarily until it is migrated into CI/CQ.
+    configs +=
+        [ "$zx_build/public/gn/config:temporarily_disable_ubsan_do_not_use" ]
+
+    # TODO(46873): Fix the leaks and remove this.
+    deps +=
+        [ "$zx/public/gn/config/instrumentation:suppress-lsan.DO-NOT-USE-THIS" ]
+  }
+} else if (current_os == host_os && current_cpu == host_cpu) {
+  # Some of the tests can run on host.
+  zx_test("fidl") {
+    sources = [
+      "abi_tests.cc",
+      "cpp_types_tests.cc",
+      "fidl_align_tests.cc",
+      "transformer_tests.c",
+    ]
+    deps = [
+      ":example.c",
+      "$zx/system/ulib/fidl:fidl_base",
+      "$zx/system/ulib/unittest",
+    ]
+  }
+}
+
+fidl_library("example") {
+  visibility = [
+    ":*",
+    "$zx/system/utest/fidl-simple:*",
+  ]
+  sources = [ "transformer.test.fidl" ]
+}
+
+fidl_library("fidl.test.coding") {
+  visibility = [ ":*" ]
+  sources = [
+    "extra_messages.test.fidl",
+    "llcpp.test.fidl",
+    "messages.test.fidl",
+  ]
+}
